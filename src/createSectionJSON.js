@@ -1,57 +1,40 @@
 var cheerio = require('cheerio');
 var fs = require('fs');
 var config = require('./config');
+var path = __dirname + '/../Contents/Resources/Documents/' + config.name + '/docs/getting-started.html';
+var indexedFilesPath = './src/indexedFiles.json';
+var src = fs.readFileSync(path, 'utf8');
+var $ = cheerio.load(src);
 
-// get base file to itterate over
-var basePath = __dirname + '/../Contents/Resources/Documents/' + config.name + '/docs/' + config.index;
-var baseSrc = fs.readFileSync(basePath, 'utf8');
-var $ = cheerio.load(baseSrc);
-var pageNamesArray = [];
-var $section = $('.' + config.sectionClass);
-var path = __dirname + '/../src/indexedFiles.js';
+var results = []
+$('div.navGroup').each(function (index, elem) {
+  var sectionHeader = $(elem).find('h3').text()
 
-$section.each(function(i, elem){
+  $(elem).find('li').each(function(i, li) {
+    var page = {};
 
-    // TODO: create a better config pointer
-    var $sectionHeader = $(this).children(config.headerTag).text();
-    var $sectionLink = $(this).children('ul').children('li').children('a');
+    page.name = $(li).find('a').attr('href').replace(/\.html$/, '').split('/').pop();
+    switch (sectionHeader) {
+        case 'Components':
+            page.type = 'Components';
+            page.toc = 'Property';
+            break;
+        case 'APIs':
+            page.type = 'Library';
+            page.toc = 'Property';
+            break;
+        case 'Polyfills':
+            page.type = 'Extension';
+            page.toc = 'Property';
+            break;
+        default:
+            page.type = config.defaultPageType;
+            page.toc = config.defaultPageTOC;
+    };
 
-    $sectionLink.each(function(i, elem){
-        var page = {};
-        var excludeArray = $(this).text();
-
-        if(config.ignoreSection.sectionsArray.indexOf($sectionHeader) !== -1) {
-            return;
-        }
-
-        // $(this).attr('href') returns ie.(guides-containers.html#content)
-        // substring removes last 5 characters '.html' from href.
-        page.name = $(this).attr('href').substring(0, $(this).attr('href').length - 5);
-
-        if(config.ignorePage.pagesArray.indexOf(excludeArray) !== -1) {
-            return;
-        }
-
-        // set the Dash types based on the doc headers.
-        switch ($sectionHeader) {
-            case 'components':
-                page.type = 'Components';
-                page.toc = 'Property';
-                break;
-            case 'apis':
-                page.type = 'Library';
-                page.toc = 'Property';
-                break;
-            case 'Polyfills':
-                page.type = 'Extension';
-                page.toc = 'Property';
-                break;
-            default:
-                page.type = config.defaultPageType;
-                page.toc = config.defaultPageTOC;
-        };
-        pageNamesArray.push(page);
-    });
+    results.push(page)
+  })
 });
 
-fs.writeFile(path, 'var indexedFiles = ' + JSON.stringify(pageNamesArray, null, 4) + ';\n\nmodule.exports = indexedFiles;', 'utf8');
+fs.writeFileSync(indexedFilesPath, JSON.stringify(results) , 'utf-8');
+

@@ -1,7 +1,7 @@
 var getData = require('./getData');
 var Sequelize = require('sequelize');
 
-// to see the relevant doc pages we crawl, check indexedFiles.js
+// to see the relevant doc pages we crawl, check indexedFiles.json
 
 // db ops
 var sequelize = new Sequelize('database', null, null, {
@@ -25,6 +25,7 @@ var searchIndex = sequelize.define(
 
 searchIndex.sync().then(function() {
   var data = getData();
+  console.log(data)
   data.forEach(function(header) {
     var si = searchIndex.build({
       name: header.name,

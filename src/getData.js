@@ -20,7 +20,7 @@ function getData() {
 
             var name = $($(elem).contents()).text();
 
-            names.push(name.trim().substring(0, name.length - 2));
+            names.push(name.trim());
         });
 
         var url = config.name + '/docs/' + array.name + '.html#';

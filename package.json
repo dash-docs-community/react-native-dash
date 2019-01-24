@@ -10,8 +10,8 @@
   "dependencies": {
     "cheerio": "^0.19.0",
     "lodash.flatten": "^3.0.2",
-    "sequelize": "^3.30.4",
-    "snyk": "^1.33.0",
+    "sequelize": "^3.31.1",
+    "snyk": "^1.69.3",
     "sqlite3": "^3.1.8"
   },
   "keywords": [
