@@ -10,7 +10,7 @@ sqlite3 docSet.dsidx 'CREATE UNIQUE INDEX anchor ON searchIndex (name, type, pat
 
 # fetch the whole doc site
 cd Documents
-wget -m -p -E -k -np -X /react-native/releases http://facebook.github.io/react-native/
+wget -m -p -E -k -np --reject-regex 'versions|blog' http://facebook.github.io/react-native/
 
 # move it around a bit
 mv facebook.github.io/react-native ./
